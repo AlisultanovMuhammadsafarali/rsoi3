@@ -1,12 +1,15 @@
-from frontend import app
+from session import app
 from flask import request, session, g, redirect, url_for, abort, \
                   render_template, flash, make_response, jsonify
+
+from models import db, Session, Users_s1
+db.init_app(app)
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('entries.html')
+    return jsonify({"message": "session backend"})
 
 
 @app.route('/login', methods=['GET', 'POST'])
