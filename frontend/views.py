@@ -1,6 +1,9 @@
 from frontend import app
 from flask import request, session, g, redirect, url_for, abort, \
                   render_template, flash, make_response, jsonify
+import json, requests
+
+headers={'Content-Type': 'application/json'}
 
 
 @app.route('/')
@@ -12,18 +15,14 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = User.query.filter_by(nickname=request.form['username'])
-        return jsonify({"username": user.nickname})
-        if user is not None:
-            if user.password ==  request.form['password']:
-                session['id'] = user.id
-                session['logged_in'] = True
+        body = json.dumps({'username': request.form['username'], 'password': request.form['password']})
+        res = requests.post('http://localhost:5003/login', data=body, headers=headers)
+        if res.status_code == 200:
+            data = json.loads(res.text)
+            response = redirect('/entries')
+            response.set_cookie('key', value=data['key'])
 
-                return redirect('me')
-            else:
-                return make_response(jsonify({"message": "invilid password"}), 401)
-        else:
-            return make_response(jsonify({"message": "invilid nickname"}), 401)
+            return response
 
     return render_template('login.html')
 
@@ -61,6 +60,22 @@ def signup():
     #     response = make_response(render_template('register.html'))
         return jsonify({"data": data})
     return render_template('signup.html')
+
+
+@app.route('/entries')
+def entries():
+    if request.method == 'GET':
+        key = request.cookies.get('key')
+        if key is not None:
+            body = json.dumps({'key': key})
+            res = requests.post('http://localhost:5003/status', data=body, headers=headers)
+            if res.status_code == 200:
+                userid = res.json()['userid']
+                data = {'userid': userid}
+                resb2 = requests.post('http://localhost:5002/entries', data=data, headers)
+
+
+    return render_template('entries.html')
 
 
 @app.route('/me')

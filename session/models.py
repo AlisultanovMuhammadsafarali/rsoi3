@@ -24,8 +24,7 @@ class Users_s1(db.Model):
     login = db.Column(db.String(60), index=True, unique=True, nullable=False)
     password = db.Column(db.String(60), index=True, nullable=False)
 
-    def __init__(self, userid, login, password):
-        self.user_id = userid
+    def __init__(self, login, password):
         self.login = login
         self.password = password
 
