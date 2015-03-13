@@ -11,9 +11,9 @@ class Entries(db.Model):
     text = db.Column(db.String(140), index=True, nullable=False)
 
     def __init__(self, userid, usertitle, usertext):
-    	self.entry_id 
+        self.entry_id 
         self.title = usertitle
         self.text = usertext
 
     def __repr__(self):
-        return '<id: %d, title: %s, text %s>' % (self.id, self.title, self.text)
+        return '<user_id: %d, title: %s, text: %s' % (self.user_fk, self.title, self.text)

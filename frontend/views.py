@@ -9,14 +9,14 @@ headers={'Content-Type': 'application/json'}
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('entries.html')
+    return render_template('entries.html', access=False)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         body = json.dumps({'username': request.form['username'], 'password': request.form['password']})
-        res = requests.post('http://localhost:5003/login', data=body, headers=headers)
+        res = requests.get('http://localhost:5003/login', data=body, headers=headers)
         if res.status_code == 200:
             data = json.loads(res.text)
             response = redirect('/entries')
@@ -24,7 +24,14 @@ def login():
 
             return response
 
-    return render_template('login.html')
+    return render_template('login.html', access=False)
+
+
+@app.route('/logout')
+def logout():
+    response = make_response(render_template('login.html', access=False))
+    response.delete_cookie('key')
+    return response
 
 
 @app.route('/signup', methods=['POST', 'GET'])
@@ -62,7 +69,7 @@ def signup():
     return render_template('signup.html')
 
 
-@app.route('/entries')
+@app.route('/entries', methods=['POST', 'GET'])
 def entries():
     if request.method == 'GET':
         key = request.cookies.get('key')
@@ -70,10 +77,12 @@ def entries():
             body = json.dumps({'key': key})
             res = requests.post('http://localhost:5003/status', data=body, headers=headers)
             if res.status_code == 200:
-                userid = res.json()['userid']
-                data = {'userid': userid}
-                resb2 = requests.post('http://localhost:5002/entries', data=data, headers)
+                data = json.loads(res.text)
+                body = json.dumps(data)
+                res_b2 = requests.get('http://localhost:5002/entries', data=body, headers=headers)
 
+                data = json.loads(res_b2.text)
+                return render_template('entries.html', access=True, entries=data)
 
     return render_template('entries.html')
 
