@@ -83,12 +83,41 @@ def entries():
 
                 data = json.loads(res_b2.text)
                 return render_template('entries.html', access=True, entries=data)
+            else:
+                flash(json.loads(res.text)['error'])
+        else:
+            return redirect('/logout')
 
     return render_template('entries.html')
 
 
-@app.route('/me')
-def me():
+@app.route('/entries/add', methods=['POST'])
+def addentries():
+    if request.method == 'POST':
+        key = request.cookies.get('key')
+        if key is not None:
+            body = json.dumps({'key': key})
+            res = requests.post('http://localhost:5003/status', data=body, headers=headers)
+            if res.status_code == 200:
+                title = request.form['title']
+                text = request.form['text']
+                data = {'userid': json.loads(res.text)['userid'], 'title': title, 'text': text}
+                res_b2 = request.post('http://localhost:5002/addentries', data=data, headers=headers)
+                if res_b2.status_code == 200:
+                    return redirect('/entryes')
+            else:
+                flash(json.loads(res.text)['error'])
+                return redirect('/entries')
+        else:
+            return redirect('/logout')
+
+    return render_template('entries.html')
+
+
+
+
+@app.route('/entries/all')
+def all():
     if session['logged_in']:
         user = User.query.filter_by(session['id'])
         return render_template('index.html', user=user)

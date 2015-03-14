@@ -32,3 +32,13 @@ def entries():
         data = {'error': {'code': code, 'message': 'Bad request', 'information': 'Incorrect credentials'}}
 
     return json.dumps(data), code
+
+
+@app.route('/entries/add', methods=['POST'])
+def addentries():
+    code = 400
+    entry = request.json.get()
+    if entry is not None:
+        
+        return json.dumps({'message': "ok"})
+    return json.dumps({'message': "ok"}), code

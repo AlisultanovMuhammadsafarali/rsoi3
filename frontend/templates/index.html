@@ -1,8 +1,17 @@
-<html>
-  <head>
-    <title>{{title}} - microblog</title>
-  </head>
-  <body>
-      <h1>Hello, {{user.nickname}}!</h1>
-  </body>
-</html>
+{% extends "layout.html" %}
+{% block body %}
+  {% if access %}
+    <form action="{{ url_for('feed') }}" method=post class=add-entry>
+      <dl>
+        <dd><input type=submit value=Share>
+      </dl>
+    </form>
+  {% endif %}
+  <ul class=entries>
+  {% for entry in entries %}
+    <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
+  {% else %}
+    <li><em>Unbelievable.  No entries here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
