@@ -17,8 +17,7 @@ def login():
             if user.password == request.json.get('password'):
                 sess = Session1.query.filter_by(user_id=user.user_id).first()
                 if sess is not None:
-                    nkey=get_key(user.user_id)
-                    sess.key = nkey
+                    nkey = sess.key
                     sess.expire = get_expire()
                     db.session.commit()
                 else:

@@ -127,12 +127,23 @@ def addentries():
     return render_template('entries.html')
 
 
-
-
-@app.route('/entries/all')
+@app.route('/entries/allusers')
 def all():
-    if session['logged_in']:
-        user = User.query.filter_by(session['id'])
-        return render_template('index.html', user=user)
+    key = request.cookies.get('key')
+    if key is not None:
+        body = json.dumps({'key': key})
+        res = requests.post('http://localhost:5003/status', data=body, headers=headers)
+        if res.status_code == 200:
+            data = json.loads(res.text)
+            body = json.dumps(data)
+            res_b1 = requests.get('http://localhost:5001/me', data=body, headers=headers)
+            data = json.loads(res_b1.text)
+            return jsonify({'res_b1': res_b1.text})
+            if res_b1.status_code == 200:
+                datame = json.loads(res_b1.text)
+                return jsonify({'data': datame})
 
-    return make_response(jsonify({"message": "access denied"}), 401)
+    else:
+        return redirect('/logout')
+
+    return redirect('/entries')
