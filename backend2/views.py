@@ -24,7 +24,6 @@ def entries():
 
             code = 200
             data = u
-            print "in b2 data", data
         else:
             code=204
             data = {'error': {'code': code, 'message': 'No Content'}}
@@ -37,8 +36,19 @@ def entries():
 @app.route('/entries/add', methods=['POST'])
 def addentries():
     code = 400
-    entry = request.json.get()
+    data = {'error': {'message': 'Bad request', 'information': 'Incorrect credentials'}}
+    entry = request.json.get('entry')
     if entry is not None:
-        
-        return json.dumps({'message': "ok"})
-    return json.dumps({'message': "ok"}), code
+        userid = entry['userid']
+        title = entry['title']
+        text = entry['text']
+        print "userid ", userid
+        print "title ", title
+        print "text ", text
+        query = Entries(userid, title, text)
+        db.session.add(query)
+        db.session.commit()
+        code = 200
+        data = {'message': "ok"}
+
+    return json.dumps(data), code

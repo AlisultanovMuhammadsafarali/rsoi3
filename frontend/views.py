@@ -9,7 +9,15 @@ headers={'Content-Type': 'application/json'}
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('entries.html', access=False)
+    key = request.cookies.get('key')
+    response = redirect('/login')
+    if key is not None:
+        body = json.dumps({'key': key})
+        res = requests.post('http://localhost:5003/status', data=body, headers=headers)
+        if res.status_code == 200:
+            response = redirect('/entries')
+
+    return response
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -88,7 +96,7 @@ def entries():
         else:
             return redirect('/logout')
 
-    return render_template('entries.html')
+    return render_template('entries.html', access=True)
 
 
 @app.route('/entries/add', methods=['POST'])
@@ -101,10 +109,15 @@ def addentries():
             if res.status_code == 200:
                 title = request.form['title']
                 text = request.form['text']
-                data = {'userid': json.loads(res.text)['userid'], 'title': title, 'text': text}
-                res_b2 = request.post('http://localhost:5002/addentries', data=data, headers=headers)
+                data = {'entry': {'userid': json.loads(res.text)['userid'], 'title': title, 'text': text}}
+                body = json.dumps(data)
+                res_b2 = requests.post('http://localhost:5002/entries/add', data=body, headers=headers)
                 if res_b2.status_code == 200:
-                    return redirect('/entryes')
+                    flash('New entry was successfully posted')
+                else:
+                    flash('failed add new entry')
+
+                return redirect('/entries')
             else:
                 flash(json.loads(res.text)['error'])
                 return redirect('/entries')

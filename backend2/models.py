@@ -11,7 +11,7 @@ class Entries(db.Model):
     text = db.Column(db.String(140), index=True, nullable=False)
 
     def __init__(self, userid, usertitle, usertext):
-        self.entry_id 
+        self.user_fk = userid
         self.title = usertitle
         self.text = usertext
 
