@@ -12,7 +12,6 @@ def me():
     userid = request.json.get('userid')
     if userid is not None:
         me = Users.query.filter_by().all()
-        print "--------------------me ", me
         if me is not None:
             u = []
             for user in me:

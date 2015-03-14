@@ -134,14 +134,17 @@ def all():
         body = json.dumps({'key': key})
         res = requests.post('http://localhost:5003/status', data=body, headers=headers)
         if res.status_code == 200:
-            data = json.loads(res.text)
-            body = json.dumps(data)
+            userid = json.loads(res.text)
+            body = json.dumps(userid)
             res_b1 = requests.get('http://localhost:5001/me', data=body, headers=headers)
-            data = json.loads(res_b1.text)
-            return jsonify({'res_b1': res_b1.text})
             if res_b1.status_code == 200:
                 datame = json.loads(res_b1.text)
-                return jsonify({'data': datame})
+
+            res_b2 = requests.get('http://localhost:5002/entries', data=body, headers=headers)
+            if res_b2.status_code == 200:
+                dataentry = json.loads(res_b2.text)
+
+            return jsonify({'datame': datame, 'dataentry': dataentry})
 
     else:
         return redirect('/logout')
