@@ -4,10 +4,12 @@
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action="{{ url_for('signup') }}" method=post>
     <dl>
-      <dt>Nickname:
-      <dd><input type=text name=username>
+      <dt>Login:
+      <dd><input type=text name=login>
       <dt>Password:
       <dd><input type=password name=password>
+      <dt>Name:
+      <dd><input type=text name=username>
       <dt>Email:
       <dd><input type=text name=email>
       <dt>Phone:

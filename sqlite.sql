@@ -1,3 +1,4 @@
+# b2
 drop table if exists Entries;
 create table Entries (
   entry_id integer primary key autoincrement,
@@ -7,6 +8,17 @@ create table Entries (
 );
 
 
+# b1
+CREATE TABLE Users (
+  id integer primary key autoincrement,
+  user_fk integer not null,
+  name text not null,
+  email text uniqua not null,
+  phone text uniqua not null
+);
+
+
+# s1
 drop table if exists Session1;
 create table Session1 (
     sess_id integer primary key autoincrement,
@@ -14,6 +26,14 @@ create table Session1 (
     key text not null,
     expire datetime not null
 );
+
+
+CREATE TABLE Users_s1 (
+  user_id integer primary key autoincrement,
+  login text uniqua not null,
+  password text not null
+);
+
 
 
 {
@@ -27,7 +47,7 @@ create table Session1 (
         }
     }
     user2: {entry {
-    
+
     }}
 }
 

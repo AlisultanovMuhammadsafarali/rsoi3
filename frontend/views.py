@@ -45,35 +45,41 @@ def logout():
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
     if request.method == 'POST':
-        nickname = request.form.get('username')
+        login = request.form.get('login')
         password = request.form.get('password')
+
+        username = request.form.get('username')
         email = request.form.get('email')
         phone= request.form.get('phone')
-        user = User(nickname, password, email, phone)
 
-        db.session.add(user)
-        db.session.commit()
+        data1 = {
+            'login': login,
+            'password': password
+        }
 
-        # user = User.query.filter_by(id=1).first()
-        # if user is not None:
-        #     data = {'username': user.nickname, 'email': user.email, 'phone': user.phone, "password": user.password}
+        body = json.dumps(data1)
+        res_s1 = requests.post('http://localhost:5003/createuser', data=body, headers=headers)
 
+        if res_s1.status_code == 200:
+            userid = json.loads(res_s1.text)['userid']
 
-        # data = {'username' : username,
-        #     'password' : password,
-        #     'name' : name,
-        #     'email' : email,
-        #     'tel' : tel}
+            data2 = {
+                'userid': userid,
+                'username': username,
+                'email': email,
+                'phone': phone
+            }
 
-    #     headers = {'Content-Type' : 'application/json'}
-    #     r = requests.post('http://localhost:5002/signup', data=json.dumps(data), headers=headers)
-    #     if r.status_code == 200:
-    #         response = make_response(render_template('home.html'), r.status_code)
-    #     else:
-    #         response = make_response(render_template('register.html'), r.status_code)
-    # else:
-    #     response = make_response(render_template('register.html'))
-        return jsonify({"data": data})
+            body = json.dumps(data2)
+            res_b1 = requests.post('http://localhost:5001/signup', data=body, headers=headers)
+            if res_b1.status_code == 200:
+                return redirect('/login')
+            else:
+                flash(json.loads(res_b1)['error'])
+                requests.delete('http://localhost:5003/delete', data=body, headers=headers)
+        else:
+            flash('Try again')
+
     return render_template('signup.html')
 
 

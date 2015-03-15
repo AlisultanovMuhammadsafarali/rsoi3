@@ -1,10 +1,10 @@
 from session import app
-from flask import request, session, g, redirect, url_for, abort, \
-                  render_template, flash, make_response, jsonify
-import os, json, hashlib
-from models import db, Session1, Users_s1, DATE_FORMAT, SESSION_EXPIRE_DAY
+from flask import request, redirect, url_for, abort
+
+import os, json
+from models import db, Session1, Users_s1, SESSION_EXPIRE_DAY
 from datetime import datetime, timedelta
-from sqlalchemy import update
+# from sqlalchemy import update
 
 db.init_app(app)
 
@@ -36,10 +36,6 @@ def login():
            code = 400
 
     return json.dumps(data), code
-
-
-def get_key(userid):
-    return hashlib.sha224(str(userid) + datetime.utcnow().strftime(DATE_FORMAT)).hexdigest()
 
 
 def get_expire():
@@ -80,3 +76,27 @@ def chkuser():
         data = {'error' : {'code' : code, 'message' : 'Bad request', 'information' : 'Incorrect parameters'}}
 
     return json.dumps(data), code
+
+
+@app.route('/createuser', methods=['POST'])
+def createuser():
+    code = 400
+    data = {'message': 'Bad request'}
+    if request.method == 'POST':
+        login = request.json.get('login')
+        password = request.json.get('password')
+        if login and password is not None:
+            user = Users_s1(login, password)
+            db.session.add(user)
+            db.session.commit()
+
+            print "userid = ", user.user_id
+            code = 200
+            data = {'userid': user.user_id}
+
+    return json.dumps(data), code
+
+
+@app.route('/delete')
+def delete():
+    return 'ok'
