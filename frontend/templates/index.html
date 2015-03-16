@@ -2,8 +2,14 @@
 {% block body %}
   {% if access %}
       <ul class=entries>
-      {% for entry in entries %}
-        <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
+      {% for user in entries %}
+        <li><h2>{{ user['username'] }}</h2>
+          {% for entry in user['entry'] %}
+            <ul>
+              <li><h2>{{ entry['title'] }}</h2>
+              <li>{{ entry['text'] }}
+            </ul>
+          {% endfor %}
       {% else %}
         <li><em>Unbelievable.  No entries here so far</em>
       {% endfor %}

@@ -36,6 +36,7 @@ h2 {
 
 .entries li { 
     margin: 0.8em 1.2em; 
+    list-style: none; 
 }
 
 .entries li h2 { 

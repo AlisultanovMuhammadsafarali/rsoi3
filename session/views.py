@@ -97,6 +97,20 @@ def createuser():
     return json.dumps(data), code
 
 
-@app.route('/delete')
+@app.route('/delete', methods=['DELETE'])
 def delete():
-    return 'ok'
+    code = 400
+    data = {'message': 'Bad request'}
+    if method == 'DELETE':
+        userid = request.json.delete('userid')
+        sess = Session1.query.filter_by(user_id=userid).first()
+        if sess is not None:
+            db.session.delete(sess)
+            db.session.commit()
+            data = {'message': 'ok'}
+            code = 200
+        else:
+            data = {'error': {'message': 'Not found'}}
+            code = 404
+
+    return json.dumps(data), code

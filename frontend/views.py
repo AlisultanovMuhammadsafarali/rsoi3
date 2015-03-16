@@ -93,7 +93,7 @@ def entries():
             if res.status_code == 200:
                 data = json.loads(res.text)
                 body = json.dumps(data)
-                res_b2 = requests.get('http://localhost:5002/entries', data=body, headers=headers)
+                res_b2 = requests.get('http://localhost:5002/entries/'+str(data['userid']), data=body, headers=headers)
 
                 data = json.loads(res_b2.text)
                 return render_template('entries.html', access=True, entries=data)
@@ -133,6 +133,12 @@ def addentries():
     return render_template('entries.html')
 
 
+class Object:
+    def to_JSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
+
+
 @app.route('/entries/allusers')
 def all():
     key = request.cookies.get('key')
@@ -146,12 +152,21 @@ def all():
             if res_b1.status_code == 200:
                 datame = json.loads(res_b1.text)
 
-            res_b2 = requests.get('http://localhost:5002/entries', data=body, headers=headers)
+            res_b2 = requests.get('http://localhost:5002/entries', headers=headers)
             if res_b2.status_code == 200:
                 dataentry = json.loads(res_b2.text)
 
-            return jsonify({'datame': datame, 'dataentry': dataentry})
+            r = []
+            for usr in datame:
+                entr = []
+                for e in dataentry:
+                    if usr['userid'] == e['userid']:
+                        entr.append({'title': e['title'], 'text': e['text']})
 
+                r.append({'username': usr['username'], 'entry': entr})
+
+            # return jsonify({'data': r})
+            return render_template('index.html', entries=r, access=True)
     else:
         return redirect('/logout')
 
